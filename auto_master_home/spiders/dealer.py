@@ -21,6 +21,7 @@ class DealerSpider(RedisCrawlSpider):
 
     def parse_item(self, response):
         self.logger.info("Hi, this is an item page! %s", response.url)
+        dealer_province = response.xpath("//div[@class='crumb-box']/a/text()").getall()
         dealer_list = response.css(".dealer-list")
         for dealer in dealer_list:
             item = {}
@@ -30,13 +31,14 @@ class DealerSpider(RedisCrawlSpider):
             dealer_phone = dealer.css(".dealer-text .camp").xpath("./em/text()").getall()
             dealer_address = dealer.css(".dealer-text .camp").xpath("./p/text()").getall()
             dealer_city = dealer.css(".dealer-city").xpath("./p/text()").getall()
+            item["dealer_province"] = dealer_province[-2]
+            item["dealer_city"] = dealer_city[0] if len(dealer_city) > 0 else None
+            item["dealer_area"] = dealer_city[1] if len(dealer_city) > 1 else None
             item["dealer_name"] = dealer_name[0] if len(dealer_name) > 0 else None
             item["dealer_type"] = dealer_type[0] if len(dealer_type) > 0 else None
             item["dealer_phone"] = dealer_phone[0] if len(dealer_phone) > 0 else None
-            item["dealer_major"] = ",".join(dealer_major[0: -1]) if len(dealer_major) > 0 else None
             item["dealer_address"] = "".join(dealer_address).replace("\n", "").replace(" ", "") if len(dealer_address) > 0 else None
-            item["dealer_city"] = dealer_city[0] if len(dealer_city) > 0 else None
-            item["dealer_area"] = dealer_city[1] if len(dealer_city) > 1 else None
+            item["dealer_major"] = ",".join(dealer_major[0: -1]) if len(dealer_major) > 0 else None
             item["crawl_datetime"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             yield item
 

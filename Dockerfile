@@ -1,4 +1,4 @@
-FROM python:anaconda-3.7
+FROM shanyanzhe/anaconda:3.7
 
 MAINTAINER dutianqing dutianqing@shanyanzhe.com
 
